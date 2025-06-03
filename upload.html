@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <style type="text/css">
+    .ci-button{
+      float: left;
+      height: 37px;
+      color: gray;
+      border-bottom: 2px solid rgba(0,0,0,0);
+      cursor: pointer;
+      font-family: Roboto, sans-serif;
+      background-color: white;
+      font-size: .875rem;
+    }
+    .ci-button:hover{
+      color: #174EA6;
+      background-color: #E3EEFC;
+    }
+    .ci-button:hover::after{
+      content: "";
+      display: block;
+      width: 80%; /* comprimento da borda */
+      border-bottom: 2px solid #174EA6;
+      margin: 0 auto; /* centraliza */
+    }
+    .ci-button label{
+      display: block;
+      cursor: pointer;
+      width: 100%;
+      height: calc(100% - 10px);
+      cursor: pointer;
+      padding-top: 10px;
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-bottom: 0px;
+    }
+    .ci-enviar{
+      background-color: #1A73E8;
+      color: white;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: Roboto, sans-serif;
+      cursor: pointer;
+      float: right;
+      font-size: .875rem;
+      margin-bottom: 10px;
+    }
+    .ci-enviar:hover{
+      background-color: #1B66C9;
+    }
+    .ci-tabble{
+      width: 100%;
+    }
+    #imgUpload{
+      width: calc(100% - 4px);
+      border: 2px solid gray
+    }
+
+  </style>
+  <body>
+    <h2 class="ci-Title"></h2>
+
+    <input type="file" id="fileInput" accept="image/*" hidden>
+    <button id="filePast" onclick="ativarColagem()" hidden>Area de transferência</button>
+    <input id="enviar" type="button" value="Fazer Upload" onclick="uploadImage()" hidden>
+    <textarea id="pasteCatcher" style="opacity:0; position:absolute; left:-9999px;"></textarea>
+
+    <table class="ci-tabble">
+      <tr>
+        <td class="ci-button">
+          <label for="fileInput">Carregar imagem</label>
+        </td>
+        <td class="ci-button">
+          <label for="filePast">Area de transferência</label>
+        </td>
+      </tr>
+    </table>
+    <p class="ci-aviso" id="status" style="color: green;"></p>
+    <label class="ci-enviar" for="enviar" id="enviarLabel"> Fazer Upload </label>
+    <br>
+    <img src="" id="imgUpload">
+    <br>
+
+
+    <script>
+      let imagemSelecionada = null;
+      let nomeArquivo = null;
+
+      document.getElementById('fileInput').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        nomeArquivo = file.name;
+        const reader = new FileReader();
+        reader.onloadend = function () {
+          imagemSelecionada = reader.result.split(',')[1];
+          document.getElementById('imgUpload').src = reader.result;
+          document.getElementById('status').textContent = 'Imagem carregada do arquivo.';
+        };
+        reader.readAsDataURL(file);
+      });
+
+      function ativarColagem() {
+        const catcher = document.getElementById('pasteCatcher');
+        catcher.value = '';
+        catcher.focus();
+        document.getElementById('status').textContent = 'Pressione Ctrl+V';
+        catcher.addEventListener('paste', handlePaste, { once: true });
+      }
+
+      function handlePaste(e) {
+        const items = e.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.type.indexOf('image') !== -1) {
+            const blob = item.getAsFile();
+            nomeArquivo = 'imagem_colada_' + Date.now() + '.png';
+            const reader = new FileReader();
+            reader.onloadend = function () {
+              imagemSelecionada = reader.result.split(',')[1];
+              document.getElementById("enviarLabel").remove();
+              document.getElementById('imgUpload').src = reader.result;
+              document.getElementById('status').textContent = 'Imagem colada com sucesso, aguarde até o termino do envio';
+              uploadImage(); // Upload automático após colar
+            };
+            reader.readAsDataURL(blob);
+            return;
+          }
+        }
+        document.getElementById('status').textContent = 'Nenhuma imagem detectada.';
+      }
+
+      function uploadImage() {
+        if (!imagemSelecionada || !nomeArquivo) {
+          alert('Nenhuma imagem foi selecionada ou colada!');
+          return;
+        }
+
+        google.script.run
+          .withSuccessHandler(function () {
+            google.script.host.close(); // Fecha o menu/modal automaticamente
+          })
+          .fazerUploadImagem({ base64: imagemSelecionada, nome: nomeArquivo });
+      }
+    </script>
+  </body>
+</html>
