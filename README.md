@@ -6,5 +6,5 @@ Pressione o ícone + (Adicionar um arquivo) HTML
 Coloque o nome "upload"
 Cole o código do arquivo deste repositório chamado "upload.html"
 
-Quando você retornar a sua planilha e atualizar a página, uma nova aba chamada "imagem ira surgir"
+Quando você retornar a sua planilha e atualizar a página, uma nova aba chamada "imagem" irá surgir
 ![image](https://github.com/user-attachments/assets/97bf9bfd-b243-4725-a9d9-af76fc3f9dbc)
