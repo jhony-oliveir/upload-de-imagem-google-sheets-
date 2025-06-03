@@ -41,7 +41,7 @@ function fazerUploadImagem(imagem) {
   //indicado para hiperlink
   const imageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
 
-  /indicado para exibição em célula com a tag image()
+  //indicado para exibição em célula com a tag image()
   const imageUrl2 = `https://lh3.google.com/u/0/d/${fileId}=k`;
 
 
